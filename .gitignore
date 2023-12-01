@@ -1,4 +1,5 @@
 # Logs
+.onedev-buildspec.yml
 logs
 *.log
 npm-debug.log*
