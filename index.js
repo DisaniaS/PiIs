@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res)=>{
-    res.send('Hello world!, проверка')
+    res.send('Hello world!, проверка 2')
 });
 
 app.listen(4444, (err) => {
