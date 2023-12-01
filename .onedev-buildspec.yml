@@ -1,0 +1,40 @@
+version: 25
+jobs:
+- name: Build/Rebuild
+  jobExecutor: dockerexec
+  steps:
+  - !PullRepository
+    name: pull
+    remoteUrl: https://github.com/DisaniaS/PiIs.git
+    syncToChildProject: false
+    refs: refs/heads/* refs/tags/*
+    withLfs: false
+    force: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CheckoutStep
+    name: check
+    cloneCredential: !DefaultCredential {}
+    withLfs: false
+    withSubmodules: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !BuildImageStep
+    name: build
+    tags: noda:latest
+    publish: false
+    removeDanglingImages: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: run
+    runInContainer: true
+    image: docker:latest
+    interpreter: !DefaultInterpreter
+      commands:
+      - docker rm --force project
+      - docker run -p 4444:4444 -d --name project noda:latest
+      - sleep 20
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
