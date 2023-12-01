@@ -1,7 +1,7 @@
 version: 25
 jobs:
-- name: Build/Rebuild
-  jobExecutor: dockerexec
+- name: pull
+  jobExecutor: shellexec
   steps:
   - !PullRepository
     name: pull
@@ -11,6 +11,13 @@ jobs:
     withLfs: false
     force: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: Build/Rebuild
+  jobExecutor: dockerexec
+  steps:
   - !CheckoutStep
     name: check
     cloneCredential: !DefaultCredential {}
@@ -34,6 +41,9 @@ jobs:
       - sleep 20
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: pull
+    requireSuccessful: true
   retryCondition: never
   maxRetries: 3
   retryDelay: 30
